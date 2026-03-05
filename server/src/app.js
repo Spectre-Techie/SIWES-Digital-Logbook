@@ -27,7 +27,7 @@ app.use(helmet({
 
 const allowedOrigins = NODE_ENV === 'production'
     ? [FRONTEND_URL.replace(/\/+$/, '')]
-    : ['http://localhost:3000'];
+    : ['http://localhost:3000', FRONTEND_URL.replace(/\/+$/, '')].filter(Boolean);
 
 app.use(cors({
     origin: allowedOrigins,
