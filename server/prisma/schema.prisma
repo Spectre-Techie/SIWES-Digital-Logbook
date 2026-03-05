@@ -1,0 +1,122 @@
+// server/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// --- Enums ---
+
+enum Role {
+  student
+  supervisor
+  faculty_admin
+}
+
+enum LogStatus {
+  pending
+  approved
+  rejected
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  excused
+}
+
+// --- Models ---
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  role      Role
+  matricNo  String?  @unique @map("matric_no") @db.VarChar(20)
+  phone     String?  @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  student            Student?  @relation("UserStudent")
+  supervisedStudents Student[] @relation("SupervisorStudents")
+
+  @@index([email])
+  @@map("users")
+}
+
+model Student {
+  id                      String   @id @default(uuid())
+  userId                  String   @unique @map("user_id")
+  supervisorId            String?  @map("supervisor_id")
+  institution             String   @default("Northwest University, Kano") @db.VarChar(200)
+  courseOfStudy            String?  @map("course_of_study") @db.VarChar(100)
+  yearOfStudy             String?  @map("year_of_study") @db.VarChar(20)
+  permanentAddress        String?  @map("permanent_address") @db.Text
+  parentPhone             String?  @map("parent_phone") @db.VarChar(20)
+  companyName             String   @map("company_name") @db.VarChar(150)
+  companyAddress          String?  @map("company_address") @db.Text
+  department              String?  @db.VarChar(100)
+  industrySupervisorName  String?  @map("industry_supervisor_name") @db.VarChar(100)
+  industrySupervisorPhone String?  @map("industry_supervisor_phone") @db.VarChar(20)
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User         @relation("UserStudent", fields: [userId], references: [id], onDelete: Cascade)
+  supervisor User?        @relation("SupervisorStudents", fields: [supervisorId], references: [id], onDelete: SetNull)
+  logs       Log[]
+  attendance Attendance[]
+
+  @@index([supervisorId])
+  @@map("students")
+}
+
+model Log {
+  id                String    @id @default(uuid())
+  studentId         String    @map("student_id")
+  date              DateTime  @db.Date
+  department        String?   @db.VarChar(100)
+  clockIn           String?   @map("clock_in") @db.VarChar(5)
+  clockOut          String?   @map("clock_out") @db.VarChar(5)
+  tasks             String    @db.Text
+  hours             Int
+  challenges        String?   @db.Text
+  lessons           String?   @db.Text
+  status            LogStatus @default(pending)
+  supervisorComment String?   @map("supervisor_comment") @db.Text
+  approvedAt        DateTime? @map("approved_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([studentId, date], name: "unique_student_log_per_day")
+  @@index([studentId, status])
+  @@index([studentId, date])
+  @@map("logs")
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  studentId String           @map("student_id")
+  date      DateTime         @db.Date
+  status    AttendanceStatus
+  markedAt  DateTime         @default(now()) @map("marked_at")
+  approved  Boolean          @default(false)
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([studentId, date], name: "unique_student_attendance_per_day")
+  @@index([studentId, date])
+  @@map("attendance")
+}

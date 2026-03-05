@@ -1,0 +1,143 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base Layer ─────────────────────────────────────────────────────────── */
+@layer base {
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        scroll-behavior: smooth;
+        text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-surface text-text-primary font-sans text-body;
+        min-height: 100svh;
+    }
+
+    .dark body {
+        @apply bg-surface-dark text-text-dark-primary;
+    }
+
+    ::selection {
+        @apply bg-primary-100 text-primary-800;
+    }
+    .dark ::selection {
+        @apply bg-primary-800 text-primary-100;
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #D4D4D8 transparent;
+    }
+    .dark * {
+        scrollbar-color: #3F3F46 transparent;
+    }
+    ::-webkit-scrollbar         { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track   { background: transparent; }
+    ::-webkit-scrollbar-thumb   { @apply bg-neutral-300 rounded-full; }
+    .dark ::-webkit-scrollbar-thumb { @apply bg-neutral-700 rounded-full; }
+
+    :focus-visible {
+        @apply outline-none ring-2 ring-primary ring-offset-2;
+    }
+    .dark :focus-visible {
+        @apply ring-offset-surface-dark;
+    }
+}
+
+/* ─── Component Layer ────────────────────────────────────────────────────── */
+@layer components {
+
+    .page-container {
+        @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8 py-6 lg:py-8;
+    }
+
+    .card {
+        @apply bg-surface-elevated border border-border rounded-2xl shadow-card;
+    }
+    .dark .card {
+        @apply bg-surface-dark-elevated border-border-dark;
+    }
+
+    .section-header {
+        @apply text-subheading font-semibold text-text-primary dark:text-text-dark-primary;
+    }
+
+    .icon-box {
+        @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
+    }
+    .icon-box-primary {
+        @apply icon-box bg-primary-100 text-primary dark:bg-primary-900/30 dark:text-primary-400;
+    }
+    .icon-box-success {
+        @apply icon-box bg-success-light text-success dark:bg-success/20;
+    }
+    .icon-box-warning {
+        @apply icon-box bg-warning-light text-warning dark:bg-warning/20;
+    }
+    .icon-box-danger {
+        @apply icon-box bg-danger-light text-danger dark:bg-danger/20;
+    }
+    .icon-box-neutral {
+        @apply icon-box bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-caption font-semibold;
+    }
+    .badge-pending  { @apply badge bg-warning-light  text-warning-dark  dark:bg-warning/15 dark:text-warning;  }
+    .badge-approved { @apply badge bg-success-light  text-success-dark  dark:bg-success/15 dark:text-success;  }
+    .badge-rejected { @apply badge bg-danger-light   text-danger-dark   dark:bg-danger/15  dark:text-danger;   }
+    .badge-present  { @apply badge bg-success-light  text-success-dark  dark:bg-success/15 dark:text-success;  }
+    .badge-absent   { @apply badge bg-danger-light   text-danger-dark   dark:bg-danger/15  dark:text-danger;   }
+    .badge-excused  { @apply badge bg-warning-light  text-warning-dark  dark:bg-warning/15 dark:text-warning;  }
+
+    .input-base {
+        @apply w-full rounded-xl border border-border bg-surface-elevated px-4 py-2.5
+               text-body text-text-primary placeholder:text-text-tertiary shadow-input
+               transition-all duration-200
+               focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
+               dark:bg-surface-dark-elevated dark:border-border-dark
+               dark:text-text-dark-primary dark:placeholder:text-text-dark-tertiary;
+    }
+
+    .empty-state {
+        @apply card p-12 text-center flex flex-col items-center gap-4;
+    }
+}
+
+/* ─── Utility Layer ──────────────────────────────────────────────────────── */
+@layer utilities {
+    .animate-fade-in  { animation: fadeIn 0.25s ease-out; }
+    .animate-slide-up { animation: slideUp 0.25s ease-out; }
+    .animate-scale-in { animation: scaleIn 0.2s ease-out; }
+
+    @keyframes fadeIn  { from { opacity: 0; }                              to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.96); }     to { opacity: 1; transform: scale(1); } }
+
+    .animate-api-bar {
+        animation: apiBar 1.5s ease-in-out infinite;
+    }
+    @keyframes apiBar {
+        0%   { width: 0%; margin-left: 0%; }
+        50%  { width: 60%; margin-left: 20%; }
+        100% { width: 0%; margin-left: 100%; }
+    }
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
