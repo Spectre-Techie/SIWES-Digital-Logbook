@@ -21,17 +21,16 @@ const app = express();
 
 // -- Security Middleware --
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-        },
-    },
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
+const allowedOrigins = NODE_ENV === 'production'
+    ? [FRONTEND_URL.replace(/\/+$/, '')]
+    : ['http://localhost:3000'];
+
 app.use(cors({
-    origin: NODE_ENV === 'production' ? FRONTEND_URL : ['http://localhost:3000'],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
